@@ -10,13 +10,13 @@
 void train_network (FILE *fp, const size_t i_m, const size_t h_m, const size_t o_m,
         double W1[i_m][h_m], double W2[h_m][o_m])
 {
-    char buffer[33];
+    char buffer[40];
 
     double inputs[i_m][1];
 
     // skip the first lines
     do {
-        fgets(buffer, 33, fp);
+        fgets(buffer, 40, fp);
     } while (buffer[0] > '@');
 
     // line counter
@@ -25,13 +25,13 @@ void train_network (FILE *fp, const size_t i_m, const size_t h_m, const size_t o
     for (int i = 0; i < 16; i++)
         inputs[i][0] = 0;
 
+    int counter = 0;
+
     do {
         if (line_c == 32) {
             // TODO: multiplication;
 
-            char b[3];
-            fgets(b, 3, fp);
-            int expected_val = b[1];
+            int expected_val = buffer[1] - 48;
 
             doubles_matrix_println(16, 1, inputs);
             printf("%d\n", expected_val);
@@ -39,21 +39,24 @@ void train_network (FILE *fp, const size_t i_m, const size_t h_m, const size_t o
             // TODO: regression;
 
             line_c = 0;
+            counter++;
             
             // reset input vector
             for (int i = 0; i < 16; i++)
                 inputs[i][0] = 0;
         } else {
             // update the input vector
-            for (int i = 0; i < 32; i++)
+            printf("%s", buffer);
+            for (int i = 0; i < 32; i++) {
                 if (buffer[i] == '1') {
-                    int col = i >> 2;
-                    int row = line_c >> 2;
-                    inputs[8*row + col][0] = 1;
+                    int col = i >> 3;
+                    int row = line_c >> 3;
+                    inputs[4*row + col][0] += 1;
                 }
+            }
             line_c++;
         }
-    } while (fgets(buffer, 32, fp) != EOF && line_c > 0); // TODO: remove line later
+    } while (fgets(buffer, 40, fp) != NULL); // TODO: remove line later
 
 }
 
