@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 
+/* Multiplies A and B into the result C */
 void doubles_matrix_multiplication
 (const size_t m, const size_t n, const size_t p, 
  const double A[m][n], const double B[n][p], double C[m][p])
@@ -17,6 +18,16 @@ void doubles_matrix_multiplication
 }
 
 
+/* Places the transpose of A in B */
+void doubles_matrix_transpose (const size_t m, const size_t n, const double A[m][n], double B[n][m])
+{
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+           B[j][i] = A[i][j];
+}
+
+
+/* Adds B to A */
 void doubles_matrix_add_to
 (const size_t m, const size_t n, double A[m][n], const double B[m][n])
 {
@@ -26,21 +37,23 @@ void doubles_matrix_add_to
 }
 
 
-int doubles_vertical_vector_find_max_index (const size_t n, const double A[n][1])
+/* Returns the index of the maximum element in a 1*n matrix (row vector) */
+int doubles_vector_find_max_index (const size_t n, const double A[1][n])
 {
     int result = 0;
     for (int i = 1; i < n; i++)
-        if (A[i][0] > A[result][0])
+        if (A[0][i] > A[0][result])
             result = i;
     return result;
 }
 
 
+/* Prints a matrix of doubles */
 void doubles_matrix_println (const size_t m, const size_t n, const double A[m][n])
 {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            printf("%-14.5lf", A[i][j]);
+            printf("%-12.5lf", A[i][j]);
         }
         printf("\n");
     }
@@ -70,6 +83,19 @@ void test_doubles_matrix_multiplication ()
 }
 
 
+void test_doubles_matrix_transpose ()
+{
+    double A[3][5] = {
+        {7, 6, 5, 9, 8},
+        {0, 9, 5, 6, 3},
+        {6, 7, 8, 5, 4}
+    };
+    double B[5][3];
+    doubles_matrix_transpose(3, 5, A, B);
+    doubles_matrix_println(5, 3, B);
+}
+
+
 void test_doubles_matrix_add_to ()
 {
     double A[2][4] = {
@@ -85,16 +111,10 @@ void test_doubles_matrix_add_to ()
 }
 
 
-void test_doubles_vertical_vector_find_max_index ()
+void test_doubles_vector_find_max_index ()
 {
-    const double A[5][1] = {
-        {4},
-        {1},
-        {0},
-        {6},
-        {6.1}
-    };
-    printf("%d\n", doubles_vertical_vector_find_max_index(5, A));
+    const double A[1][5] = {{4, 1, 0, 6, 6.1}};
+    printf("%d\n", doubles_vector_find_max_index(5, A));
 }
 
 
