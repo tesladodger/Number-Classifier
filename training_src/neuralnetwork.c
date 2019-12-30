@@ -179,7 +179,7 @@ int main (int argc, char *argv[])
     }
 
     // save the resulting weights to a csv file
-    FILE *fp = fopen("nn.csv", "w");
+    FILE *fp = fopen("../out/nn.csv", "w");
     for (int i = 0; i < i_n; i++) {
         for (int j = 0; j < h_n; j++)
             fprintf(fp, "%lf,", W1[i][j]);
