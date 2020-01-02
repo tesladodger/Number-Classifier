@@ -13,6 +13,17 @@ double sigmoid_transfer_function (double x)
 }
 
 
+void softmax_function (const size_t n, double a[1][n])
+{
+    double sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += pow(M_E, a[0][i]);
+
+    for (int i = 0; i < n; i++)
+        a[0][i] = pow(M_E, a[0][i]) / sum;
+}
+
+
 void feed_forward (const size_t i_n, const size_t h_n, const size_t o_n,
         const double W1[i_n][h_n], const double W2[h_n][o_n],
         const double B1[1][h_n], const double B2[1][o_n],
@@ -20,7 +31,7 @@ void feed_forward (const size_t i_n, const size_t h_n, const size_t o_n,
 {
     // input normalization (what fraction of the squared is covered)
     for (int i = 0; i < i_n; i++)
-        inputs[0][i] /= 64;
+        inputs[0][i] /= 32;
 
     // calculate the hidden layer
     doubles_matrix_multiplication(1, i_n, h_n, inputs, W1, hiddens);
@@ -35,8 +46,7 @@ void feed_forward (const size_t i_n, const size_t h_n, const size_t o_n,
     doubles_matrix_add_to(1, o_n, outputs, B2);
 
     // apply the transfer function to the outputs
-    for (int i = 0; i < o_n; i++)
-        outputs[0][i] = sigmoid_transfer_function(outputs[0][i]);
+    softmax_function(o_n, outputs);
 }
 
 
@@ -123,16 +133,16 @@ void train_network (FILE *fp, const size_t i_n, const size_t h_n, const size_t o
             line_c = 0;
             counter++;
             
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < i_n; i++)
                 inputs[0][i] = 0;
 
         } else {
             // update the input vector
             for (int i = 0; i < 32; i++) {
                 if (buffer[i] == '1') {
-                    int col = i >> 3;
-                    int row = line_c >> 3;
-                    inputs[0][4*row + col] += 1;
+                    int col = i >> 2;
+                    int row = line_c >> 2;
+                    inputs[0][8*row + col] += 1;
                 }
             }
             line_c++;
@@ -145,8 +155,8 @@ void train_network (FILE *fp, const size_t i_n, const size_t h_n, const size_t o
 int main (int argc, char *argv[])
 {
     // sizes of the input, hidden and output vectors
-    const size_t i_n = 16;
-    const size_t h_n = 14;
+    const size_t i_n = 64;
+    const size_t h_n = 32;
     const size_t o_n = 10;
 
     // matrices for the weights of the connections

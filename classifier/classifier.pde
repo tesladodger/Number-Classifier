@@ -14,11 +14,11 @@ void setup () {
   size(640, 700); //640);
   grid = new int[32][32];
 
-  W1 = new double[16][14];
-  W2 = new double[14][10];
-  B1 = new double[14];
+  W1 = new double[64][32];
+  W2 = new double[32][10];
+  B1 = new double[32];
   B2 = new double[10];
-  hiddens = new double[14];
+  hiddens = new double[32];
   outputs = new double[10];
 
   readFile();
@@ -96,37 +96,43 @@ void mouseClicked () {
 
 
 void feedForward () {
-  inputs = new double[16];
+  inputs = new double[64];
   for (int i = 0; i < 32; i++) {
     for (int j = 0; j < 32; j++) {
       if (grid[i][j] == 1) {
-        int col = i >> 3;
-        int row = j >> 3;
-        inputs[4*row+col] += 1;
+        int col = i >> 2;
+        int row = j >> 2;
+        inputs[8*row+col] += 1;
       }
     }
   }
+  for (int i = 0; i < 64; i++) inputs[i] /= 32;
+  System.out.println("\n");
+  for (double in : inputs) System.out.println(in);
+  System.out.println("\n");
+
   
-  
-  for (int i = 0; i < 14; i++) {
+  for (int i = 0; i < 32; i++) {
     hiddens[i] = 0;
-    for (int j = 0; j < 16; j++) {
+    for (int j = 0; j < 64; j++) {
       hiddens[i] += inputs[j] * W1[j][i];
     }
     hiddens[i] += B1[i];
     hiddens[i] = sigmoid(hiddens[i]);
   }
   
+  double sum = 0;
   for (int i = 0; i < 10; i++) {
     outputs[i] = 0;
-    for (int j = 0; j < 14; j++) {
+    for (int j = 0; j < 32; j++) {
       outputs[i] += hiddens[j] * W2[j][i];
     }
     outputs[i] += B2[i];
-    outputs[i] = sigmoid(outputs[i]);
+    sum += Math.pow(Math.E, outputs[i]);
   }
+  for (int i = 0; i < 10; i++) outputs[i] = Math.pow(Math.E, outputs[i]) / sum;
   
-  for (double out : outputs) System.out.println(out);
+  //for (double out : outputs) System.out.println(out);
   int prediction = 0;
   for (int i = 0; i < 10; i++) {
     if (outputs[i] > outputs[prediction]) {
@@ -158,15 +164,15 @@ void readFile () {
 
     String[] vals = split(line, ",");
 
-    if (lCounter < 16) {
-      for (int i = 0; i < 14; i++) {
+    if (lCounter < 64) {
+      for (int i = 0; i < 32; i++) {
         W1[lCounter][i] = Double.parseDouble(vals[i]);
       }
-    } else if (lCounter < 30) {
+    } else if (lCounter < 96) {
       for (int i = 0; i < 10; i++) {
-        W2[lCounter-16][i] = Double.parseDouble(vals[i]);
+        W2[lCounter-64][i] = Double.parseDouble(vals[i]);
       }
-    } else if (lCounter == 30) {
+    } else if (lCounter == 96) {
       for (int i = 0; i < 14; i++) {
         B1[i] = Double.parseDouble(vals[i]);
       }
@@ -175,5 +181,5 @@ void readFile () {
         B2[i] = Double.parseDouble(vals[i]);
       }
     }
-  } while (++lCounter < 32);
+  } while (++lCounter < 98);
 }
