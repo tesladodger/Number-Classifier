@@ -192,19 +192,19 @@ int main (int argc, char *argv[])
     FILE *fp = fopen("../out/nn.csv", "w");
     for (int i = 0; i < i_n; i++) {
         for (int j = 0; j < h_n; j++)
-            fprintf(fp, "%lf,", W1[i][j]);
+            fprintf(fp, "%.8lf,", W1[i][j]);
         fprintf(fp, "\n");
     }
     for (int i = 0; i < h_n; i++) {
         for (int j = 0; j < o_n; j++)
-            fprintf(fp, "%lf,", W2[i][j]);
+            fprintf(fp, "%.8lf,", W2[i][j]);
         fprintf(fp, "\n");
     }
     for (int i = 0; i < h_n; i++)
-        fprintf(fp, "%lf,", B1[0][i]);
+        fprintf(fp, "%.8lf,", B1[0][i]);
     fprintf(fp, "\n");
     for (int i = 0; i < o_n; i++)
-        fprintf(fp, "%lf,", B2[0][i]);
+        fprintf(fp, "%.8lf,", B2[0][i]);
     fprintf(fp, "\n");
     fclose(fp);
 
